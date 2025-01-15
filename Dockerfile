@@ -8,7 +8,7 @@ RUN apk add python3-dev build-base linux-headers pcre-dev && pip install --no-ca
 ADD . /webapp
 
 # configure path /webapp to HOME-dir
-ENV HOME /webapp
+ENV HOME=/webapp
 WORKDIR /webapp
 
 ENTRYPOINT ["uwsgi"]

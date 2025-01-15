@@ -1,10 +1,29 @@
-{
-    listen          80;
-    server_name     {{ name }},
-    access_log      logs/{{ name }}.access.log main;
 
+server {
+    listen 336x; # replace x by an appropriate number
+    server_name localhost;
+
+    root /var/www/html/{{ name }}/public; #adjust root as needed
+    index index.php index.html index.htm;
+
+    # Logs for Nginx access and errors
+    access_log /var/log/nginx/{{ name }}.access.log;
+    error_log /var/log/nginx/{{ name }}.error.log;
+
+    ###################################################################
+    # If you are using php leave the following parameters as they are.
+    # Otherwise you can delete them
+    ###################################################################
+    # Redirects requests to index.php if the file is not found
     location / {
-        proxy_pass      http://127.0.0.1:8080;
+        try_files $uri $uri/ /index.php?$query_string;
     }
 
+    # Passes PHP requests to PHP-FPM container
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_pass php-fpm:9000; # Replace with your PHP-FPM container name
+        fastcgi_index index.php;
+    }
 }
